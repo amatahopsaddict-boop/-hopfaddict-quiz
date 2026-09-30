@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hopfaddict Amata - Craft Beer Millionaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-color:#0b0712;--panel-bg:rgba(25,16,38,.95);--neon-pink:#ff007f;--neon-gold:#ffb700;--neon-blue:#00e5ff;--text-light:#fff;--correct:#28a745;--wrong:#dc3545}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Kanit',sans-serif}
+body{background-color:var(--bg-color);background-image:radial-gradient(circle at 50% 20%,#2a1442 0%,#0b0712 80%);color:var(--text-light);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:15px}
+header{width:100%;max-width:1000px;text-align:center;margin-bottom:15px}
+.brand-title{font-size:2.2rem;font-weight:800;color:var(--neon-gold);text-shadow:0 0 12px rgba(255,183,0,.6);letter-spacing:1px}
+.slogan{color:var(--neon-pink);font-size:1.1rem;font-weight:bold;text-shadow:0 0 8px var(--neon-pink)}
+.app-container{width:100%;max-width:1000px;background:var(--panel-bg);border:2px solid #3d245c;border-radius:20px;box-shadow:0 0 35px rgba(255,0,127,.25);padding:20px}
+.main-layout{display:grid;grid-template-columns:1fr 280px;gap:20px}
+.lifelines{display:flex;justify-content:space-around;gap:8px;background:rgba(0,0,0,.4);padding:10px;border-radius:12px;margin-bottom:20px;flex-wrap:wrap}
+.lifeline-btn{background:#25133a;border:2px solid var(--neon-blue);color:#fff;padding:8px 16px;border-radius:25px;font-size:.9rem;font-weight:bold;cursor:pointer;transition:.2s}
+.lifeline-btn:hover:not(:disabled){background:var(--neon-blue);color:#000;box-shadow:0 0 10px var(--neon-blue)}
+.lifeline-btn:disabled{opacity:.3;cursor:not-allowed;border-color:#666}
+.question-box{background:linear-gradient(135deg,#2c1642 0%,#150921 100%);border:2px solid var(--neon-gold);border-radius:15px;padding:25px;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.2rem;margin-bottom:20px;box-shadow:inset 0 0 15px rgba(0,0,0,.6)}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.option-btn{background:#201233;border:2px solid #48296d;color:#fff;padding:14px 18px;border-radius:12px;font-size:.95rem;text-align:left;cursor:pointer;transition:.2s;display:flex;align-items:center}
+.option-btn:hover:not(:disabled){border-color:var(--neon-gold);background:#361c57;transform:translateY(-2px)}
+.option-btn .prefix{color:var(--neon-gold);font-weight:bold;margin-right:10px}
+.option-btn.correct{background:var(--correct)!important;border-color:#fff!important}
+.option-btn.wrong{background:var(--wrong)!important;border-color:#fff!important}
+.option-btn.hidden-opt{visibility:hidden;pointer-events:none}
+.money-ladder{background:rgba(0,0,0,.4);border-radius:15px;padding:12px;display:flex;flex-direction:column-reverse;gap:4px}
+.ladder-step{display:flex;justify-content:space-between;padding:5px 10px;border-radius:6px;font-size:.85rem;color:#888}
+.ladder-step.safe{color:var(--neon-blue);font-weight:bold}
+.ladder-step.active{background:var(--neon-gold);color:#000;font-weight:bold;box-shadow:0 0 10px var(--neon-gold)}
+.screen-center{text-align:center;padding:40px 10px}
+.action-btn{background:var(--neon-pink);color:#fff;border:0;padding:14px 35px;font-size:1.3rem;font-weight:bold;border-radius:50px;cursor:pointer;box-shadow:0 0 20px var(--neon-pink);transition:.3s;margin-top:15px}
+.action-btn:hover{transform:scale(1.05);background:#e00070}
+.hidden{display:none!important}
+@media(max-width:768px){.main-layout{grid-template-columns:1fr}.money-ladder{order:-1;max-height:185px;overflow:auto}}
+@media(max-width:500px){.options-grid{grid-template-columns:1fr}.brand-title{font-size:1.7rem}.app-container{padding:12px}}
+</style>
+</head>
+<body>
+<header><div class="brand-title">HOPFADDICT AMATA</div><div class="slogan">STOP THINKING START DRINKING</div></header>
+<div class="app-container">
+<div id="start-screen" class="screen-center">
+<h2 style="color:var(--neon-gold);font-size:2rem;margin-bottom:10px">ควิซเกมเศรษฐี คราฟต์เบียร์แชมเปียน</h2>
+<p style="color:#bbb;margin-bottom:20px">ทดสอบความรู้คราฟต์เบียร์ 15 ข้อ ชนะรางวัลเกียรติยศระดับ Brewmaster!</p>
+<button class="action-btn" onclick="startGame()">เริ่มเล่นเกมเลย</button>
+</div>
+<div id="play-screen" class="main-layout hidden">
+<div>
+<div class="lifelines">
+<button id="btn-5050" class="lifeline-btn" onclick="use5050()">50 : 50</button>
+<button id="btn-ask" class="lifeline-btn" onclick="useAskAudience()">ถามนักดื่มข้างๆ</button>
+<button id="btn-swap" class="lifeline-btn" onclick="useSwap()">เปลี่ยนคำถาม</button>
+</div>
+<div id="question-text" class="question-box">กำลังโหลดคำถาม...</div>
+<div class="options-grid">
+<button class="option-btn" onclick="selectAnswer(0)"><span class="prefix">ก:</span><span id="opt0"></span></button>
+<button class="option-btn" onclick="selectAnswer(1)"><span class="prefix">ข:</span><span id="opt1"></span></button>
+<button class="option-btn" onclick="selectAnswer(2)"><span class="prefix">ค:</span><span id="opt2"></span></button>
+<button class="option-btn" onclick="selectAnswer(3)"><span class="prefix">ง:</span><span id="opt3"></span></button>
+</div>
+</div>
+<div class="money-ladder" id="ladder"></div>
+</div>
+<div id="end-screen" class="screen-center hidden">
+<h2 id="end-title" style="font-size:2.2rem;margin-bottom:10px">จบเกม!</h2>
+<p style="color:#aaa;font-size:1.1rem">ระดับรางวัลที่ทำได้:</p>
+<h1 id="final-prize" style="color:var(--neon-gold);font-size:2.8rem;margin:15px 0">0 THB</h1>
+<button class="action-btn" onclick="startGame()">เล่นใหม่อีกครั้ง</button>
+</div>
+</div>
+<script>
+const masterBank = [
+{q:"วัตถุดิบหลัก 4 อย่างตามกฎการบริสุทธิ์ของเบียร์เยอรมัน คือข้อใด?",options:["น้ำ, มอลต์, ฮอปส์, ยีสต์","น้ำ, ข้าวเจ้า, ฮอปส์, น้ำตาล","น้ำ, มอลต์, ผลไม้, ยีสต์","น้ำ, ข้าวสาลี, น้ำผึ้ง, ฮอปส์"],answer:0,lvl:1},
+{q:"ตัวย่อ 'IPA' ในวงการคราฟต์เบียร์ ย่อมาจากคำว่าอะไร?",options:["International Pale Ale","India Pale Ale","Imperial Pale Ale","Irish Pale Ale"],answer:1,lvl:1},
+{q:"ความแตกต่างหลักระหว่างเบียร์ตระกูล Lager และ Ale คือข้อใด?",options:["ชนิดขวดบรรจุ","ชนิดของยีสต์และอุณหภูมิที่ใช้หมัก","ปริมาณโซดาที่เติม","ปริมาณแอลกอฮอล์"],answer:1,lvl:1},
+{q:"สัญลักษณ์ 'IBU' บนฉลากเบียร์ ย่อมาจากอะไร?",options:["International Bitterness Units","International Beer Union","Imperial Bitterness Utility","Indian Beer Units"],answer:0,lvl:1},
+{q:"หากเบียร์มีค่า IBU สูง หมายถึงเบียร์ตัวนั้นมีลักษณะอย่างไร?",options:["รสหวานจัด","แอลกอฮอล์สูงมาก","มีความขมจากฮอปส์สูง","มีฟองนุ่มหนา"],answer:2,lvl:1},
+{q:"ตัวย่อ 'ABV' บนขวดเบียร์ หมายถึงอะไร?",options:["Alcohol By Volume","Alcohol Before Vinegar","Average Beer Volume","Acid By Volume"],answer:0,lvl:1},
+{q:"เบียร์สไตล์ Stout มักจะมีสีและรสชาติเด่นชัดแบบใด?",options:["สีเหลืองทอง รสเปรี้ยว","สีดำเข้ม รสคล้ายกาแฟหรือช็อกโกแลต","สีชมพู รสผลไม้","สีใส รสหวานฉ่ำ"],answer:1,lvl:1},
+{q:"เบียร์สไตล์ Wheat Beer หรือ Weissbier ทำจากวัตถุดิบใดเป็นหลักร่วมกับมอลต์ข้าวบาร์เลย์?",options:["ข้าวโพด","ข้าวสาลี","ข้าวเหนียว","ข้าวไรย์"],answer:1,lvl:1},
+{q:"กลิ่นหอมฟรุตตี้ ดอกไม้ หรือผลไม้เขตร้อนในคราฟต์เบียร์ส่วนใหญ่มาจากวัตถุดิบใด?",options:["การแต่งกลิ่นสังเคราะห์","ฮอปส์ (Hops)","เปลือกส้มตากแห้ง","น้ำตาลเมา"],answer:1,lvl:1},
+{q:"เบียร์ประเภทใดจัดอยู่ในตระกูล Lager?",options:["Pilsner","Stout","Porter","IPA"],answer:0,lvl:1},
+{q:"ข้อความบนป้ายไฟนีออนประดับร้าน Hopfaddict Amata คือคำว่าอะไร?",options:["Keep Calm and Drink Beer","Stop Thinking Start Drinking","Beer is the Answer","Save Water Drink Beer"],answer:1,lvl:1},
+{q:"เบียร์ Pilsner มีต้นกำเนิดจากเมืองพิลเซน ในประเทศใด?",options:["เยอรมนี","สาธารณรัฐเช็ก","เบลเยียม","ออสเตรีย"],answer:1,lvl:1},
+{q:"การรินเบียร์ให้มีฟองหนาประมาณ 1–2 นิ้ว มีประโยชน์อย่างไร?",options:["กักเก็บกลิ่นหอมและช่วยลดการสัมผัสอากาศ","ทำให้เบียร์หมดไวขึ้น","ลดปริมาณแอลกอฮอล์","เพิ่มความหวาน"],answer:0,lvl:1},
+{q:"แก้วทรง 'Pint Glass' นิยมใช้เสิร์ฟเบียร์สไตล์ใดเป็นหลัก?",options:["Pilsner และ Lager","Ale และ IPA","Champagne Beer","Sour Beer"],answer:1,lvl:1},
+{q:"คำว่า 'Draught Beer' หรือ 'Draft Beer' หมายถึงเบียร์แบบใด?",options:["เบียร์กระป๋อง","เบียร์สดที่เสิร์ฟจากถัง (Keg)","เบียร์หมักในขวด","เบียร์ไร้แอลกอฮอล์"],answer:1,lvl:1},
+
+{q:"NEIPA ย่อมาจากสไตล์เบียร์ใด?",options:["New England IPA","Non-filtered European IPA","Next Edition IPA","New East IPA"],answer:0,lvl:2},
+{q:"เอกลักษณ์สำคัญของเบียร์สไตล์ NEIPA คือข้อใด?",options:["สีดำสนิท ขมจัด","เบียร์สีขุ่น (Hazy) กลิ่นผลไม้ชัดเจน ความขมต่ำ","สีใสแจ๋ว รสเปรี้ยวจัด","ไม่มีฟอง รสหวานปานกลาง"],answer:1,lvl:2},
+{q:"เทคนิค 'Dry Hopping' หมายถึงขั้นตอนใดในการทำเบียร์?",options:["ต้มฮอปส์แห้งในหม้อต้ม","ใส่ฮอปส์ช่วงหมักเพื่อเพิ่มกลิ่นหอมโดยเพิ่มความขมน้อย","ตากแห้งฮอปส์ก่อนต้ม","บดฮอปส์ชงดื่ม"],answer:1,lvl:2},
+{q:"จุลินทรีย์ใดนิยมใช้สร้างกรดแลกติกใน Sour Beer หลายรูปแบบ?",options:["Saccharomyces","Lactobacillus","E. coli","Penicillium"],answer:1,lvl:2},
+{q:"เบียร์สไตล์ 'Session IPA' ออกแบบมาเพื่อวัตถุประสงค์ใด?",options:["เพิ่ม ABV สูงเกิน 10%","ดื่มง่ายและมี ABV ต่ำกว่า IPA ที่แรงกว่า","บรรจุขวดใหญ่พิเศษ","ดื่มเฉพาะฤดูหนาว"],answer:1,lvl:2},
+{q:"เบียร์สไตล์ 'Saison' มีต้นกำเนิดจากประเทศใด?",options:["เยอรมนี","เบลเยียม","อังกฤษ","สกอตแลนด์"],answer:1,lvl:2},
+{q:"เบียร์สไตล์ Lambic แบบดั้งเดิมใช้การหมักด้วยวิธีใด?",options:["Top-fermentation อย่างเดียว","Bottom-fermentation อย่างเดียว","Spontaneous fermentation","No fermentation"],answer:2,lvl:2},
+{q:"ฮอปส์สายพันธุ์ 'Citra' และ 'Cascade' มักเด่นในโทนกลิ่นใด?",options:["ช็อกโกแลตและวานิลลา","ซิตรัสและผลไม้","ควันและกาแฟ","ขนมปังและถั่ว"],answer:1,lvl:2},
+{q:"Russian Imperial Stout มีประวัติเชื่อมโยงกับตลาดราชสำนักประเทศใด?",options:["ฝรั่งเศส","รัสเซีย","สเปน","สวีเดน"],answer:1,lvl:2},
+{q:"แก้วทรง 'Snifter' เหมาะกับเบียร์ลักษณะใด?",options:["Light Lager เท่านั้น","เบียร์กลิ่นซับซ้อนหรือ ABV สูง เช่น Imperial Stout/Barleywine","น้ำเปล่า","Pilsner เท่านั้น"],answer:1,lvl:2},
+{q:"Reinheitsgebot ของบาวาเรียประกาศในปีใด?",options:["1416","1516","1616","1716"],answer:1,lvl:2},
+{q:"ยีสต์ที่ใช้กับ Ale โดยทั่วไปคือกลุ่มใด?",options:["Saccharomyces cerevisiae","Saccharomyces pastorianus","Acetobacter","Penicillium"],answer:0,lvl:2},
+{q:"เบียร์ที่ใช้เครื่องหมาย Authentic Trappist Product ต้องมีความเกี่ยวข้องกับอะไร?",options:["โรงงานรัฐบาล","อาราม Trappist และการกำกับดูแลตามเกณฑ์ของสมาคม","เมืองเดียวในเยอรมนี","น้ำตกธรรมชาติ"],answer:1,lvl:2},
+{q:"Bock แบบดั้งเดิมเป็นเบียร์จากประเทศใดและอยู่ในตระกูลใด?",options:["เยอรมนี - Lager","อังกฤษ - Pale Ale","สหรัฐฯ - IPA","ไอร์แลนด์ - Stout"],answer:0,lvl:2},
+{q:"กลิ่นคล้ายกล้วยและกานพลูเด่นในเบียร์สไตล์ใด?",options:["American IPA","German Hefeweizen","Irish Stout","Czech Pilsner"],answer:1,lvl:2},
+{q:"Double IPA มักมีลักษณะใดเมื่อเทียบกับ IPA ทั่วไป?",options:["ABV และฮอปต่ำกว่า","มักมี ABV และความเข้มข้นสูงกว่า","ไม่มีฮอปส์","ไม่มีแอลกอฮอล์"],answer:1,lvl:2},
+{q:"Gose แบบดั้งเดิมมักมีองค์ประกอบเด่นใด?",options:["กาแฟและโกโก้","เกลือและผักชี","นมและวานิลลา","ชาเขียวและน้ำผึ้ง"],answer:1,lvl:2},
+{q:"Porter มีชื่อเชื่อมโยงกับกลุ่มอาชีพใดในลอนดอน?",options:["ชาวประมง","คนขนของ/Porter","ช่างก่อสร้าง","นักดนตรี"],answer:1,lvl:2},
+{q:"Milk Stout มักใช้ส่วนผสมใดเพิ่มความหวานและเนื้อสัมผัส?",options:["กลูโคสเท่านั้น","นมสด","แลกโตส (Lactose)","น้ำเชื่อมเมเปิล"],answer:2,lvl:2},
+
+{q:"หน่วย SRM หรือ EBC ใช้บอกคุณสมบัติใดของเบียร์?",options:["ความขม","สีของเบียร์","ปริมาณ CO2","ความหนาของฟอง"],answer:1,lvl:3},
+{q:"กระบวนการ Mashing คืออะไร?",options:["ต้มฮอปส์ในน้ำเดือด","แช่มอลต์บดในน้ำที่ควบคุมอุณหภูมิเพื่อเปลี่ยนแป้งเป็นน้ำตาล","แยกยีสต์ออก","อัดก๊าซลงถัง"],answer:1,lvl:3},
+{q:"ของเหลวหวานจากมอลต์ก่อนการหมักเรียกว่าอะไร?",options:["Wort","Must","Mash Juice","Beer Base"],answer:0,lvl:3},
+{q:"ก๊าซใดนิยมใช้ร่วมกับ CO2 เพื่อให้ Stout มีฟองเนียนนุ่ม?",options:["ออกซิเจน","ไนโตรเจน","ไฮโดรเจน","อาร์กอน"],answer:1,lvl:3},
+{q:"กลิ่น skunky หรือ Light-struck เกิดจากอะไร?",options:["ความเย็นจัด","สารจากฮอปส์เกิดปฏิกิริยาจากแสง","ยีสต์มากเกินไป","แรงดันต่ำ"],answer:1,lvl:3},
+{q:"สารในฮอปส์ที่เป็นแหล่งสำคัญของความขมหลังการต้มคืออะไร?",options:["Alpha acids","Beta glucan","Lactose","Lactic acid"],answer:0,lvl:3},
+{q:"Krausen ในช่วงการหมักหมายถึงอะไร?",options:["ตะกอนมอลต์แห้ง","ชั้นฟองหนาบนผิวเบียร์ช่วงการหมักกำลังทำงาน","ถังแตก","การเปลี่ยนสีของขวด"],answer:1,lvl:3},
+{q:"Barleywine คืออะไร?",options:["ไวน์องุ่น","Strong Ale ที่มีแอลกอฮอล์ค่อนข้างสูง","ไซเดอร์","ลาเกอร์ไร้แอลกอฮอล์"],answer:1,lvl:3},
+{q:"Cold crash มีจุดประสงค์หลักใด?",options:["ลด ABV","ช่วยให้ยีสต์และอนุภาคตกตะกอน ทำให้เบียร์ใสขึ้น","เพิ่ม IBU","เพิ่มน้ำตาล"],answer:1,lvl:3},
+{q:"ยีสต์ Lager ที่ใช้แพร่หลายคือชนิดใด?",options:["Saccharomyces cerevisiae","Saccharomyces pastorianus","Brettanomyces bruxellensis","Candida albicans"],answer:1,lvl:3},
+{q:"ยีสต์ Ale ที่ใช้แพร่หลายคือชนิดใด?",options:["Saccharomyces cerevisiae","Saccharomyces pastorianus","Acetobacter aceti","Penicillium"],answer:0,lvl:3},
+{q:"คำว่า Wild Ale มักสื่อถึงอะไร?",options:["ใช้ยีสต์ขนมปังเท่านั้น","เบียร์ที่ใช้จุลินทรีย์นอกเหนือจากสายพันธุ์บริสุทธิ์แบบทั่วไป เช่น Brettanomyces และ/หรือแบคทีเรีย","เบียร์ไม่มีการหมัก","เบียร์ไม่มีมอลต์"],answer:1,lvl:3},
+{q:"Lacing คืออะไร?",options:["คราบฟองที่เกาะผนังแก้วหลังดื่ม","ตะกอนก้นถัง","กลิ่นฮอปส์","ฟองในถังหมัก"],answer:0,lvl:3},
+{q:"Rauchbier จาก Bamberg มีเอกลักษณ์เด่นอะไร?",options:["มอลต์รมควัน","พริกไทยดำ","น้ำผึ้ง","ชาเขียว"],answer:0,lvl:3},
+{q:"เทศกาลเบียร์ที่ใช้ธีมฟ้า-ขาวแบบบาวาเรียและมีชื่อเสียงระดับโลกคือเทศกาลใด?",options:["St. Patrick's Day","Oktoberfest","GABF","Belgian Beer Weekend"],answer:1,lvl:3}
+];
+
+const prizeLevels=["1,000 THB","2,000 THB","3,000 THB","5,000 THB","10,000 THB (เซฟพอยต์)","20,000 THB","30,000 THB","50,000 THB","100,000 THB","200,000 THB (เซฟพอยต์)","300,000 THB","400,000 THB","500,000 THB","800,000 THB","1,000,000 THB (Brewmaster)"];
+let currentGameQuestions=[],backupSwapQuestions=[],currentStep=0,isAnsweringBlocked=false;
+
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+
+function startGame(){
+ const lvl1=shuffle(masterBank.filter(q=>q.lvl===1)).slice(0,5);
+ const lvl2=shuffle(masterBank.filter(q=>q.lvl===2)).slice(0,5);
+ const lvl3=shuffle(masterBank.filter(q=>q.lvl===3)).slice(0,5);
+ currentGameQuestions=[...lvl1,...lvl2,...lvl3];
+ backupSwapQuestions=shuffle(masterBank.filter(q=>!currentGameQuestions.includes(q)));
+ currentStep=0; isAnsweringBlocked=false;
+ ['btn-5050','btn-ask','btn-swap'].forEach(id=>document.getElementById(id).disabled=false);
+ document.getElementById('start-screen').classList.add('hidden');
+ document.getElementById('end-screen').classList.add('hidden');
+ document.getElementById('play-screen').classList.remove('hidden');
+ loadQuestion();
+}
+function renderLadder(){
+ const el=document.getElementById('ladder'); el.innerHTML='';
+ prizeLevels.forEach((p,i)=>{
+  const s=document.createElement('div');s.className='ladder-step';
+  if([4,9,14].includes(i))s.classList.add('safe');
+  if(i===currentStep)s.classList.add('active');
+  s.innerHTML=`<span>ข้อ ${i+1}</span><span>${p}</span>`;el.appendChild(s);
+ });
+}
+function loadQuestion(){
+ const q=currentGameQuestions[currentStep];
+ if(!q){endGame(currentStep>=15);return;}
+ isAnsweringBlocked=false;
+ document.getElementById('question-text').innerText=`ข้อที่ ${currentStep+1}: ${q.q}`;
+ document.querySelectorAll('.option-btn').forEach((b,i)=>{
+  b.classList.remove('correct','wrong','hidden-opt');b.disabled=false;
+  document.getElementById(`opt${i}`).innerText=q.options[i];
+ });
+ renderLadder();
+}
+function selectAnswer(i){
+ if(isAnsweringBlocked)return;
+ const btns=document.querySelectorAll('.option-btn');
+ if(btns[i].classList.contains('hidden-opt'))return;
+ isAnsweringBlocked=true;btns.forEach(b=>b.disabled=true);
+ const correct=currentGameQuestions[currentStep].answer;
+ if(i===correct){
+  btns[i].classList.add('correct');
+  setTimeout(()=>{currentStep++;currentStep>=15?endGame(true):loadQuestion()},800);
+ }else{
+  btns[i].classList.add('wrong');btns[correct].classList.add('correct');
+  setTimeout(()=>endGame(false),1300);
+ }
+}
+function use5050(){
+ if(isAnsweringBlocked)return;
+ document.getElementById('btn-5050').disabled=true;
+ const correct=currentGameQuestions[currentStep].answer;
+ const wrong=shuffle([0,1,2,3].filter(i=>i!==correct)).slice(0,2);
+ const btns=document.querySelectorAll('.option-btn');
+ wrong.forEach(i=>btns[i].classList.add('hidden-opt'));
+}
+function useAskAudience(){
+ if(isAnsweringBlocked)return;
+ document.getElementById('btn-ask').disabled=true;
+ const correct=currentGameQuestions[currentStep].answer;
+ const choices=['ก','ข','ค','ง'];
+ alert(`🍺 เสียงเชียร์จากโต๊ะข้างๆ บอกว่า: มั่นใจว่าข้อ "${choices[correct]}" ชัวร์!`);
+}
+function useSwap(){
+ if(isAnsweringBlocked)return;
+ const swapBtn=document.getElementById('btn-swap');swapBtn.disabled=true;
+ if(!backupSwapQuestions.length){alert('ไม่มีคำถามสำรองแล้ว');return;}
+ currentGameQuestions[currentStep]=backupSwapQuestions.shift();
+ loadQuestion();
+}
+function endGame(win){
+ document.getElementById('play-screen').classList.add('hidden');
+ document.getElementById('end-screen').classList.remove('hidden');
+ const title=document.getElementById('end-title'),prize=document.getElementById('final-prize');
+ if(win){title.innerText="🏆 ยินดีด้วย! คุณคือ BREWMASTER ตัวจริง!";prize.innerText=prizeLevels[14]}
+ else{
+  title.innerText="เสียใจด้วย คุณตอบผิด!";
+  prize.innerText=currentStep>=10?prizeLevels[9]:currentStep>=5?prizeLevels[4]:"0 THB";
+ }
+}
+</script>
+</body>
+</html>
